@@ -1,0 +1,30 @@
+services:
+  # Backend Spring Boot Service
+  - type: web
+    name: blood-donation-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: 8080
+      - key: JAVA_OPTS
+        value: "-Xmx512m -Xss512k -XX:+UseContainerSupport"
+    healthCheckPath: /actuator/health
+    
+  # Frontend React Service (if you want to deploy separately)
+  # - type: web
+  #   name: blood-donation-frontend
+  #   runtime: static
+  #   buildCommand: cd frontend-implementation && npm install && npm run build
+  #   staticPublishPath: frontend-implementation/build
+  #   envVars:
+  #     - key: REACT_APP_API_URL
+  #       fromService:
+  #         type: web
+  #         name: blood-donation-backend
+  #         property: host

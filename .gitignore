@@ -36,3 +36,12 @@ build/
 src/main/resources/blood-donation-admin-SDK.json
 src/main/resources/firebase-service-account.json
 application-local.properties
+
+### macOS ###
+.DS_Store
+**/.DS_Store
+
+### Frontend ###
+frontend-implementation/node_modules/
+frontend-implementation/build/
+frontend-implementation/.env.local
