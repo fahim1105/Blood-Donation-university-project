@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+*.md
+.DS_Store
+.vscode/
+*.log
+
+# Sensitive files
+src/main/resources/blood-donation-admin-SDK.json
+src/main/resources/firebase-service-account.json
