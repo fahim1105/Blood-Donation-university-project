@@ -1,5 +1,8 @@
 package com.example.blood_donation.security;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -9,6 +12,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +34,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .headers(h -> h.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
             .authorizeHttpRequests(auth -> auth
                 // All page routes — auth handled client-side via Firebase JS SDK
@@ -56,9 +63,16 @@ public class SecurityConfig {
                     "/api/v1/requests/*/status",
                     "/api/v1/requests/*/respond",
                     "/api/v1/requests/*/responses",
+                    "/api/v1/requests/*/complete",
                     "/api/v1/requests/*",
                     "/api/v1/requests/direct",
-                    "/api/v1/requests/direct/**",
+                    "/api/v1/requests/direct/sent",
+                    "/api/v1/requests/direct/received",
+                    "/api/v1/requests/direct/pending",
+                    "/api/v1/requests/direct/pending/count",
+                    "/api/v1/requests/direct/*",
+                    "/api/v1/requests/direct/*/accept",
+                    "/api/v1/requests/direct/*/decline",
                     "/api/v1/donations/log",
                     "/api/v1/donations/my",
                     "/api/v1/donations/my/count"
@@ -79,5 +93,43 @@ public class SecurityConfig {
             .logout(AbstractHttpConfigurer::disable);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // Allow specific origins (cannot use * with credentials)
+        configuration.setAllowedOriginPatterns(List.of("*")); // Allow all origin patterns
+        
+        // Or specify exact origins:
+        // configuration.setAllowedOrigins(List.of(
+        //     "http://localhost:3000",
+        //     "http://localhost:8080",
+        //     "https://blood-donation-university-project.onrender.com"
+        // ));
+        
+        // Allow all common HTTP methods
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
+        
+        // Allow all headers
+        configuration.setAllowedHeaders(List.of("*"));
+        
+        // Allow credentials (cookies, authorization headers)
+        configuration.setAllowCredentials(true);
+        
+        // Cache preflight response for 1 hour
+        configuration.setMaxAge(3600L);
+        
+        // Expose these headers to the client
+        configuration.setExposedHeaders(Arrays.asList(
+            "Authorization", "Content-Type"
+        ));
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
