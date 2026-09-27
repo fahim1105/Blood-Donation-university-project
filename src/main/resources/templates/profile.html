@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>My Profile — HEMO®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
+    input, select, button { font-family: 'Space Grotesk', sans-serif; }
+    .input-field { width:100%;background:#1C1C1C;border:1px solid #333;color:#fff;border-radius:8px;padding:12px 16px;font-size:0.9rem;outline:none;transition:border-color 300ms; }
+    .input-field:focus { border-color: #DC2626; }
+    .input-field::placeholder { color: rgba(255,255,255,0.3); }
+    select.input-field option { background: #1C1C1C; color: #fff; }
+    .btn-primary { background:#DC2626;color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 300ms;font-family:'Space Grotesk',sans-serif; }
+    .btn-primary:hover { background: #b91c1c; }
+    .btn-secondary { background:transparent;color:#fff;border:1px solid #333;border-radius:8px;padding:11px 20px;font-size:0.85rem;font-weight:500;cursor:pointer;transition:border-color 300ms,background 300ms;font-family:'Space Grotesk',sans-serif; }
+    .btn-secondary:hover { border-color: #555; background: rgba(255,255,255,0.04); }
+    label { display:block;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px; }
+    .card { background:#141414;border:1px solid #1C1C1C;border-radius:12px; }
+    .tab-btn { background:transparent;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif;width:100%;text-align:left;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:0.85rem;font-weight:500;transition:background 200ms,color 200ms; }
+    .tab-btn.active { background:rgba(220,38,38,0.12);color:#DC2626; }
+    .tab-btn:not(.active) { color:rgba(255,255,255,0.5); }
+    .tab-btn:not(.active):hover { background:rgba(255,255,255,0.04);color:#fff; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.4); }
+    #profile-content { display: flex; gap: 32px; flex-wrap: wrap; }
+    #avatar-wrap:hover #avatar-overlay { opacity: 1 !important; }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="page-main" style="padding:88px 72px 72px;max-width:1280px;margin:0 auto;">
+
+  <!-- Auth Guard -->
+  <div id="auth-guard" class="hidden auth-guard-panel">
+    <div style="font-size:4rem;margin-bottom:16px;opacity:0.3;"><i class="fas fa-lock"></i></div>
+    <p style="font-weight:600;font-size:1.25rem;margin-bottom:8px;">Sign in required</p>
+    <p style="color:rgba(255,255,255,0.4);font-size:0.9rem;margin-bottom:24px;">Please login to view your profile.</p>
+    <a href="/login" style="background:#DC2626;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;font-size:0.9rem;">Go to Login</a>
+  </div>
+
+  <!-- Profile Content -->
+  <div id="profile-content" class="hidden">
+
+    <!-- Sidebar -->
+    <div style="width:280px;flex-shrink:0;">
+      <div class="card" style="padding:28px;text-align:center;position:sticky;top:90px;">
+
+        <!-- Avatar — clickable for photo upload -->
+        <div id="avatar-wrap"
+             style="width:80px;height:80px;background:rgba(220,38,38,0.15);border-radius:50%;
+                    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+                    border:2px solid rgba(220,38,38,0.3);cursor:pointer;position:relative;overflow:hidden;"
+             title="Click to change profile photo"
+             onclick="document.getElementById('photo-file-input').click()">
+          <img id="avatar-img" src="" alt="Profile"
+               style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;"/>
+          <span id="avatar-initials" style="font-size:2rem;"><i class="fas fa-user"></i></span>
+          <!-- Camera overlay on hover -->
+          <div id="avatar-overlay"
+               style="position:absolute;inset:0;background:rgba(0,0,0,0.55);border-radius:50%;
+                      display:flex;flex-direction:column;align-items:center;justify-content:center;
+                      opacity:0;transition:opacity 200ms;font-size:0.65rem;gap:2px;color:#fff;pointer-events:none;">
+            <span style="font-size:1.2rem;"><i class="fas fa-camera"></i></span>
+            <span style="font-weight:600;letter-spacing:0.05em;">Change</span>
+          </div>
+          <!-- Upload spinner -->
+          <div id="avatar-spinner"
+               style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.65);
+                      border-radius:50%;align-items:center;justify-content:center;">
+            <svg style="width:24px;height:24px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+              <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"/>
+              <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Hidden file input -->
+        <input type="file" id="photo-file-input" accept="image/*" style="display:none;"/>
+
+        <h2 id="profile-name" style="font-size:1.1rem;font-weight:600;color:#fff;">Loading...</h2>
+        <p id="profile-email" style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:4px;"></p>
+
+        <!-- Blood group badge -->
+        <div style="margin:16px 0 4px;">
+          <span id="profile-blood-group"
+                style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#DC2626;color:#fff;font-size:1rem;font-weight:700;">—</span>
+        </div>
+        <p style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);">Blood Group</p>
+        <p id="sidebar-donation-count" style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:4px;text-align:center;"></p>
+
+        <!-- Availability toggle -->
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid #1C1C1C;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:0.85rem;font-weight:500;color:rgba(255,255,255,0.7);">Available to Donate</span>
+          <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;margin:0;text-transform:none;letter-spacing:0;font-size:inherit;color:inherit;">
+            <input type="checkbox" id="availability-toggle" style="position:absolute;opacity:0;width:0;height:0;"/>
+            <span id="toggle-track" style="display:block;width:42px;height:24px;background:#333;border-radius:12px;position:relative;transition:background 300ms;">
+              <span id="toggle-thumb" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:left 300ms;"></span>
+            </span>
+          </label>
+        </div>
+        <p id="availability-status-text" style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:6px;text-align:left;">Loading...</p>
+
+        <!-- Tab navigation -->
+        <div style="margin-top:20px;display:flex;flex-direction:column;gap:4px;">
+          <button class="tab-btn active" id="nav-tab-details"  onclick="showTab('tab-details')"><i class="fas fa-user"></i> My Details</button>
+          <button class="tab-btn"        id="nav-tab-requests" onclick="showTab('tab-requests')"><i class="fas fa-tint"></i> My Requests</button>
+          <button class="tab-btn"        id="nav-tab-history"  onclick="showTab('tab-history')"><i class="fas fa-clipboard-list"></i> Donation History <span id="donation-count-badge" style="display:none;background:rgba(220,38,38,0.15);color:#DC2626;border-radius:20px;padding:1px 8px;font-size:0.7rem;font-weight:700;"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main panel -->
+    <div style="flex:1;min-width:0;">
+
+      <!-- Feedback banners -->
+      <div id="save-success" style="display:none;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:#86efac;font-size:0.85rem;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
+        <i class="fas fa-check-circle"></i> Profile updated successfully!
+      </div>
+      <div id="save-error" style="display:none;background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.3);color:#fca5a5;font-size:0.85rem;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
+        <i class="fas fa-times-circle"></i> <span id="save-error-msg">Failed to update profile.</span>
+      </div>
+
+      <!-- DETAILS TAB -->
+      <div id="tab-details" class="card" style="padding:32px;">
+        <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:28px;">My Details</h3>
+        
+        <!-- Personal Information -->
+        <form id="profile-form" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;">
+          <div>
+            <label for="edit-name">Full Name</label>
+            <input type="text" id="edit-name" class="input-field"/>
+          </div>
+          <div>
+            <label for="edit-phone">Phone</label>
+            <input type="tel" id="edit-phone" class="input-field"/>
+          </div>
+          <div>
+            <label for="edit-blood-group">Blood Group</label>
+            <select id="edit-blood-group" class="input-field">
+              <option value="">Select</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+            </select>
+          </div>
+          <div>
+            <label for="edit-last-donation">Last Donation Date</label>
+            <input type="date" id="edit-last-donation" class="input-field"/>
+          </div>
+          <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:12px;margin-top:8px;">
+            <button type="button" id="reset-profile-btn" class="btn-secondary">Reset</button>
+            <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+          </div>
+        </form>
+
+        <!-- Location Section -->
+        <div style="border-top:1px solid #1C1C1C;padding-top:32px;">
+          <h4 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fas fa-map-marker-alt"></i> My Location</h4>
+          <p style="color:rgba(255,255,255,0.35);font-size:0.82rem;margin-bottom:24px;">
+            Set your location so blood seekers can find you and see how far you are.
+          </p>
+
+          <!-- Cascading dropdowns -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+              <label for="loc-division">Division</label>
+              <select id="loc-division" class="input-field">
+                <option value="">Select Division</option>
+              </select>
+            </div>
+            <div>
+              <label for="loc-district">District</label>
+              <select id="loc-district" class="input-field">
+                <option value="">Select District</option>
+              </select>
+            </div>
+            <div>
+              <label for="loc-upazila">Upazila</label>
+              <select id="loc-upazila" class="input-field">
+                <option value="">Select Upazila</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Last updated info -->
+          <p id="loc-last-updated" style="font-size:0.75rem;color:rgba(255,255,255,0.25);margin-bottom:20px;display:none;"></p>
+
+          <!-- Save button -->
+          <div style="display:flex;justify-content:flex-end;">
+            <button id="save-location-btn" type="button" class="btn-primary"><i class="fas fa-save"></i> Save Location</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REQUESTS TAB -->
+      <div id="tab-requests" class="card" style="padding:32px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-size:1.25rem;font-weight:700;"><i class="fas fa-tint"></i> My Blood Requests</h3>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Manage your blood requests and track responses.</p>
+          </div>
+          <a href="/request-blood"
+             style="background:#DC2626;color:#fff;text-decoration:none;padding:9px 18px;
+                    border-radius:8px;font-size:0.82rem;font-weight:600;
+                    display:inline-flex;align-items:center;gap:6px;
+                    transition:background 200ms;white-space:nowrap;"
+             onmouseover="this.style.background='#b91c1c'"
+             onmouseout="this.style.background='#DC2626'">
+            + New Request
+          </a>
+        </div>
+        <div id="my-requests-list">
+          <div style="display:flex;justify-content:center;padding:48px 0;">
+            <svg style="width:28px;height:28px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+              <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+              <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- DONATION HISTORY TAB -->
+      <div id="tab-history" class="card" style="padding:32px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-size:1.25rem;font-weight:700;"><i class="fas fa-clipboard-list"></i> Donation History</h3>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Track every blood donation you have made.</p>
+          </div>
+          <button id="log-donation-btn" type="button" class="btn-primary" style="display:flex;align-items:center;gap:6px;">
+            + Log a Donation
+          </button>
+        </div>
+
+        <!-- Log Donation Form (hidden by default) -->
+        <div id="log-donation-form"
+             style="display:none;background:#1C1C1C;border:1px solid #333;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:18px;color:rgba(255,255,255,0.7);">New Donation Entry</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="grid-column:1/-1;">
+              <label for="dh-hospital">Hospital Name *</label>
+              <input type="text" id="dh-hospital" class="input-field" placeholder="e.g. Dhaka Medical College Hospital"/>
+            </div>
+            <div>
+              <label for="dh-division">Division</label>
+              <select id="dh-division" class="input-field">
+                <option value="">Select Division</option>
+              </select>
+            </div>
+            <div>
+              <label for="dh-district">District</label>
+              <select id="dh-district" class="input-field">
+                <option value="">Select District</option>
+              </select>
+            </div>
+            <div style="grid-column:1/-1;">
+              <label for="dh-upazila">Upazila</label>
+              <select id="dh-upazila" class="input-field">
+                <option value="">Select Upazila</option>
+              </select>
+            </div>
+            <div>
+              <label for="dh-date">Donation Date *</label>
+              <input type="date" id="dh-date" class="input-field" style="color-scheme:dark;"/>
+            </div>
+            <div>
+              <label for="dh-units">Units Given</label>
+              <input type="number" id="dh-units" class="input-field" value="1" min="1" max="5"/>
+            </div>
+            <div style="grid-column:1/-1;">
+              <label for="dh-notes">Notes (optional)</label>
+              <input type="text" id="dh-notes" class="input-field" placeholder="Any notes about this donation"/>
+            </div>
+          </div>
+          <div id="dh-error" style="display:none;margin-top:12px;background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.3);color:#fca5a5;font-size:0.82rem;border-radius:8px;padding:10px 14px;"></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px;">
+            <button id="dh-cancel-btn" type="button" class="btn-secondary">Cancel</button>
+            <button id="dh-submit-btn" type="button" class="btn-primary"><i class="fas fa-save"></i> Save Donation</button>
+          </div>
+        </div>
+
+        <!-- History list -->
+        <div id="donation-history-list">
+          <div style="display:flex;justify-content:center;padding:48px 0;">
+            <svg style="width:28px;height:28px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+              <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+              <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<style>
+  @media (max-width:900px) { #profile-content { flex-direction: column !important; } #profile-content > div:first-child { width: 100% !important; } #tab-details form { grid-template-columns: 1fr !important; } main { padding: 88px 24px 48px !important; } }
+</style>
+
+<script>
+  function showTab(tabId) {
+    var tabs = ['tab-details','tab-requests','tab-history'];
+    tabs.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = (id === tabId) ? 'block' : 'none';
+    });
+    ['nav-tab-details','nav-tab-requests','nav-tab-history'].forEach(function(id) {
+      var btn = document.getElementById(id);
+      if (!btn) return;
+      var tabId2 = id.replace('nav-','');
+      if (tabId2 === tabId) { btn.classList.add('active'); } else { btn.classList.remove('active'); }
+    });
+    var hashMap = { 'tab-history': 'history', 'tab-requests': 'requests', 'tab-details': 'details' };
+    if (hashMap[tabId] && history.replaceState) {
+      history.replaceState(null, '', '#' + hashMap[tabId]);
+    }
+  }
+  (function () {
+    var hash = (location.hash || '').replace('#', '');
+    var map = { history: 'tab-history', requests: 'tab-requests', details: 'tab-details' };
+    if (map[hash]) showTab(map[hash]);
+  })();
+</script>
+
+<script src="/js/bd-locations.js"></script>
+<script src="/js/toast.js"></script>
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/auth-state.js"></script>
+<script type="module" src="/js/profile.js"></script>
+</body>
+</html>

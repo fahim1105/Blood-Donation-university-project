@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Privacy Policy — HEMO®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
+    .content { max-width: 900px; margin: 0 auto; padding: 88px 24px 60px; }
+    h1 { font-size: clamp(2rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 12px; }
+    h2 { font-size: 1.5rem; font-weight: 600; margin-top: 32px; margin-bottom: 12px; color: #DC2626; }
+    h3 { font-size: 1.2rem; font-weight: 600; margin-top: 24px; margin-bottom: 10px; }
+    p, li { line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 14px; }
+    ul { margin-left: 24px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid #333; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 200ms; margin-bottom: 24px; }
+    .back-btn:hover { border-color: #DC2626; color: #DC2626; }
+    .updated { color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-bottom: 32px; }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="content">
+  <a href="javascript:history.back()" class="back-btn">← Back</a>
+  
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: September 24, 2026</p>
+
+  <p>At HEMO®, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our blood donation management platform.</p>
+
+  <h2>1. Information We Collect</h2>
+  
+  <h3>Personal Information</h3>
+  <p>When you register for an account, we collect:</p>
+  <ul>
+    <li>Full name</li>
+    <li>Email address</li>
+    <li>Phone number</li>
+    <li>Blood group</li>
+    <li>Gender</li>
+    <li>Date of birth</li>
+    <li>Location (Division, District, Upazila)</li>
+    <li>Last blood donation date</li>
+  </ul>
+
+  <h3>Usage Data</h3>
+  <p>We automatically collect certain information when you use our platform, including:</p>
+  <ul>
+    <li>IP address</li>
+    <li>Browser type and version</li>
+    <li>Pages visited and time spent</li>
+    <li>Device information</li>
+  </ul>
+
+  <h2>2. How We Use Your Information</h2>
+  <p>We use the information we collect to:</p>
+  <ul>
+    <li>Create and manage your account</li>
+    <li>Connect blood donors with recipients</li>
+    <li>Send notifications about urgent blood requests</li>
+    <li>Improve our platform and services</li>
+    <li>Comply with legal obligations</li>
+    <li>Prevent fraud and ensure platform security</li>
+  </ul>
+
+  <h2>3. Information Sharing</h2>
+  <p>We share your information only in the following circumstances:</p>
+  <ul>
+    <li><strong>With blood seekers:</strong> When you respond to a blood request, your contact information is shared with the requester</li>
+    <li><strong>With other donors:</strong> Your public profile (name, blood group, location) is visible to other users searching for donors</li>
+    <li><strong>Legal requirements:</strong> When required by law or to protect our rights</li>
+    <li><strong>Service providers:</strong> With trusted third-party services that help us operate our platform (e.g., Firebase, MongoDB)</li>
+  </ul>
+
+  <h2>4. Data Security</h2>
+  <p>We implement appropriate technical and organizational measures to protect your personal information, including:</p>
+  <ul>
+    <li>Encryption of data in transit and at rest</li>
+    <li>Firebase Authentication for secure account access</li>
+    <li>Regular security audits and updates</li>
+    <li>Access controls and monitoring</li>
+  </ul>
+
+  <h2>5. Your Rights</h2>
+  <p>You have the right to:</p>
+  <ul>
+    <li><strong>Access:</strong> Request a copy of your personal data</li>
+    <li><strong>Rectification:</strong> Update or correct inaccurate information</li>
+    <li><strong>Deletion:</strong> Request deletion of your account and data</li>
+    <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
+    <li><strong>Data portability:</strong> Receive your data in a structured format</li>
+  </ul>
+
+  <h2>6. Cookies and Tracking</h2>
+  <p>We use essential cookies and local storage to:</p>
+  <ul>
+    <li>Maintain your login session</li>
+    <li>Remember your preferences</li>
+    <li>Analyze platform usage patterns</li>
+  </ul>
+
+  <h2>7. Children's Privacy</h2>
+  <p>Our platform is not intended for individuals under 18 years of age. We do not knowingly collect personal information from children.</p>
+
+  <h2>8. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new policy on this page with an updated "Last updated" date.</p>
+
+  <h2>9. Contact Us</h2>
+  <p>If you have questions about this Privacy Policy or our data practices, please contact us at:</p>
+  <p style="margin-top: 16px;">
+    <strong>Email:</strong> privacy@hemo.com<br/>
+    <strong>Phone:</strong> +880 1XXX-XXXXXX
+  </p>
+
+  <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #1C1C1C;">
+    <a href="javascript:history.back()" class="back-btn">← Back to Registration</a>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

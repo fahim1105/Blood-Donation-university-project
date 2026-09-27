@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Terms & Conditions — HEMO®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
+    .content { max-width: 900px; margin: 0 auto; padding: 88px 24px 60px; }
+    h1 { font-size: clamp(2rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 12px; }
+    h2 { font-size: 1.5rem; font-weight: 600; margin-top: 32px; margin-bottom: 12px; color: #DC2626; }
+    h3 { font-size: 1.2rem; font-weight: 600; margin-top: 24px; margin-bottom: 10px; }
+    p, li { line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 14px; }
+    ul { margin-left: 24px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid #333; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 200ms; margin-bottom: 24px; }
+    .back-btn:hover { border-color: #DC2626; color: #DC2626; }
+    .updated { color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-bottom: 32px; }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="content">
+  <a href="javascript:history.back()" class="back-btn">← Back</a>
+  
+  <h1>Terms & Conditions</h1>
+  <p class="updated">Last updated: September 24, 2026</p>
+
+  <p>Welcome to HEMO®. By accessing or using our blood donation management platform, you agree to be bound by these Terms and Conditions. Please read them carefully.</p>
+
+  <h2>1. Acceptance of Terms</h2>
+  <p>By creating an account and using HEMO®, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy.</p>
+
+  <h2>2. Eligibility</h2>
+  <p>To use HEMO®, you must:</p>
+  <ul>
+    <li>Be at least 18 years of age</li>
+    <li>Meet the medical criteria for blood donation as per Bangladesh health regulations</li>
+    <li>Provide accurate and truthful information</li>
+    <li>Not be prohibited from using the platform under any applicable law</li>
+  </ul>
+
+  <h2>3. User Accounts</h2>
+  
+  <h3>Account Creation</h3>
+  <p>When you create an account, you agree to:</p>
+  <ul>
+    <li>Provide accurate, current, and complete information</li>
+    <li>Maintain and update your information to keep it accurate</li>
+    <li>Maintain the security of your password</li>
+    <li>Accept responsibility for all activities under your account</li>
+    <li>Notify us immediately of any unauthorized use</li>
+  </ul>
+
+  <h3>Account Termination</h3>
+  <p>We reserve the right to suspend or terminate your account if you violate these Terms or engage in fraudulent, abusive, or illegal activities.</p>
+
+  <h2>4. User Responsibilities</h2>
+  
+  <h3>As a Donor</h3>
+  <ul>
+    <li>Ensure you meet all medical criteria before committing to donate</li>
+    <li>Update your availability status accurately</li>
+    <li>Honor your commitments to donate blood when you respond to requests</li>
+    <li>Accurately report your last donation date</li>
+  </ul>
+
+  <h3>As a Blood Seeker</h3>
+  <ul>
+    <li>Post only genuine blood requests</li>
+    <li>Provide accurate information about patient needs</li>
+    <li>Update request status when blood is received</li>
+    <li>Respect donor privacy and use contact information only for blood donation purposes</li>
+  </ul>
+
+  <h2>5. Platform Usage Rules</h2>
+  <p>You agree NOT to:</p>
+  <ul>
+    <li>Post false or misleading information</li>
+    <li>Use the platform for commercial purposes without authorization</li>
+    <li>Harass, threaten, or abuse other users</li>
+    <li>Attempt to hack, disrupt, or compromise platform security</li>
+    <li>Scrape or collect user data without permission</li>
+    <li>Impersonate others or create fake accounts</li>
+    <li>Violate any applicable laws or regulations</li>
+  </ul>
+
+  <h2>6. Content and Information</h2>
+  <p>You retain ownership of any content you post. By posting content, you grant HEMO® a non-exclusive, worldwide license to use, display, and distribute your content on the platform.</p>
+  <p>We reserve the right to remove any content that violates these Terms or is deemed inappropriate.</p>
+
+  <h2>7. Medical Disclaimer</h2>
+  <p><strong>IMPORTANT:</strong> HEMO® is a platform to connect donors and recipients. We are NOT a medical service provider.</p>
+  <ul>
+    <li>We do not verify medical information or blood test results</li>
+    <li>We do not provide medical advice or consultation</li>
+    <li>We do not handle or transport blood</li>
+    <li>Users must follow proper medical procedures and visit licensed medical facilities</li>
+    <li>Always consult healthcare professionals before donating or receiving blood</li>
+  </ul>
+
+  <h2>8. Liability and Disclaimers</h2>
+  
+  <h3>Platform Availability</h3>
+  <p>We provide the platform "as is" without warranties of any kind. We do not guarantee:</p>
+  <ul>
+    <li>Uninterrupted or error-free service</li>
+    <li>Accuracy or reliability of user-provided information</li>
+    <li>Successful blood donation matches</li>
+    <li>Security against unauthorized access</li>
+  </ul>
+
+  <h3>Limitation of Liability</h3>
+  <p>HEMO® shall not be liable for:</p>
+  <ul>
+    <li>Direct, indirect, or consequential damages arising from platform use</li>
+    <li>User misconduct or failure to fulfill commitments</li>
+    <li>Medical complications or health issues</li>
+    <li>Loss of data or service interruptions</li>
+    <li>Third-party actions or content</li>
+  </ul>
+
+  <h2>9. Privacy and Data Protection</h2>
+  <p>Your use of HEMO® is also governed by our Privacy Policy. We collect, use, and protect your data as described in our Privacy Policy.</p>
+
+  <h2>10. Intellectual Property</h2>
+  <p>All content, features, and functionality of HEMO® (including design, logos, text, graphics, and software) are owned by HEMO® and protected by copyright and trademark laws.</p>
+
+  <h2>11. Third-Party Services</h2>
+  <p>Our platform uses third-party services (Firebase, MongoDB, etc.). Your use of these services is subject to their respective terms and policies.</p>
+
+  <h2>12. Emergency Situations</h2>
+  <p>In life-threatening emergencies, always call emergency services (999 in Bangladesh) or visit the nearest hospital immediately. Do not rely solely on this platform for urgent medical needs.</p>
+
+  <h2>13. Modifications to Terms</h2>
+  <p>We reserve the right to modify these Terms at any time. Continued use of the platform after changes constitutes acceptance of the new Terms.</p>
+
+  <h2>14. Governing Law</h2>
+  <p>These Terms shall be governed by the laws of Bangladesh. Any disputes shall be subject to the exclusive jurisdiction of Bangladeshi courts.</p>
+
+  <h2>15. Contact Us</h2>
+  <p>For questions about these Terms, please contact us at:</p>
+  <p style="margin-top: 16px;">
+    <strong>Email:</strong> support@hemo.com<br/>
+    <strong>Phone:</strong> +880 1XXX-XXXXXX
+  </p>
+
+  <h2>16. Severability</h2>
+  <p>If any provision of these Terms is found to be unenforceable, the remaining provisions shall remain in full effect.</p>
+
+  <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #1C1C1C;">
+    <a href="javascript:history.back()" class="back-btn">← Back to Registration</a>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

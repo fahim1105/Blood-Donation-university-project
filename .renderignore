@@ -1,0 +1,24 @@
+# Render Ignore File
+# Files and directories to exclude from deployment
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Local configuration
+application-local.properties
+src/main/resources/blood-donation-admin-SDK.json
+
+# Build artifacts (will be rebuilt on Render)
+target/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+HELP.md
+QUICK_START.md

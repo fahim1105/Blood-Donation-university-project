@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Find Donors — HEMO®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
+    input, select, button { font-family: 'Space Grotesk', sans-serif; }
+    .input-field { width:100%;background:#1C1C1C;border:1px solid #333;color:#fff;border-radius:8px;padding:12px 16px;font-size:0.9rem;outline:none;transition:border-color 300ms; }
+    .input-field:focus { border-color: #DC2626; }
+    select.input-field option { background: #1C1C1C; color: #fff; }
+    .btn-primary { background:#DC2626;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:background 300ms;white-space:nowrap;font-family:'Space Grotesk',sans-serif; }
+    .btn-primary:hover { background: #b91c1c; }
+    label { display:block;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse-dot { 0%,100%{opacity:1;}50%{opacity:0.3;} }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="page-main" style="padding: 88px 72px 72px; max-width: 1280px; margin: 0 auto;">
+
+  <!-- Page header -->
+  <div style="margin-bottom:40px;">
+    <h1 style="font-size:clamp(2rem,5vw,3.5rem);font-weight:700;letter-spacing:-0.03em;color:#fff;">Find Blood Donors</h1>
+    <p style="color:rgba(255,255,255,0.4);margin-top:10px;font-size:0.95rem;">Search available donors by blood group and location</p>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="background:#141414;border:1px solid #1C1C1C;border-radius:12px;padding:24px;margin-bottom:16px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;align-items:flex-end;">
+
+      <!-- Blood Group -->
+      <div>
+        <label for="search-blood-group">Blood Group</label>
+        <select id="search-blood-group" class="input-field">
+          <option value="">All Blood Groups</option>
+          <option th:each="bg : ${bloodGroups}" th:value="${bg}" th:text="${bg}">A+</option>
+        </select>
+      </div>
+
+      <!-- Division -->
+      <div>
+        <label for="search-division">Division</label>
+        <select id="search-division" class="input-field">
+          <option value="">All Divisions</option>
+        </select>
+      </div>
+
+      <!-- District -->
+      <div>
+        <label for="search-district">District</label>
+        <select id="search-district" class="input-field">
+          <option value="">All Districts</option>
+        </select>
+      </div>
+
+      <!-- Upazila -->
+      <div>
+        <label for="search-upazila">Upazila</label>
+        <select id="search-upazila" class="input-field">
+          <option value="">All Upazilas</option>
+        </select>
+      </div>
+
+      <!-- Search button -->
+      <div>
+        <button id="search-btn" class="btn-primary" style="width:100%;"><i class="fas fa-search"></i> Search</button>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- Results meta -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <p id="results-count" style="font-size:0.85rem;color:rgba(255,255,255,0.4);">Enter criteria above to find donors</p>
+    <p id="availability-note" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.3);">Showing donors eligible to donate (donated 90+ days ago)</p>
+  </div>
+
+  <!-- Loading state -->
+  <div id="loading-state" style="display:none;justify-content:center;padding:80px 0;flex-direction:column;align-items:center;gap:14px;">
+    <svg style="width:36px;height:36px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+      <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+      <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+    </svg>
+    <p style="color:rgba(255,255,255,0.4);font-size:0.9rem;">Searching donors...</p>
+  </div>
+
+  <!-- Donors grid -->
+  <div id="donors-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+    <!-- Empty state -->
+    <div id="empty-state" style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;text-align:center;">
+      <i class="fas fa-search" style="font-size:4rem;margin-bottom:16px;opacity:0.3;"></i>
+      <p style="color:rgba(255,255,255,0.4);font-size:1rem;font-weight:500;">Search for available donors</p>
+      <p style="color:rgba(255,255,255,0.25);font-size:0.85rem;margin-top:6px;">Select a blood group or district to get started</p>
+    </div>
+  </div>
+
+  <!-- Active Blood Requests — donors can respond here -->
+  <div id="blood-requests-section" style="margin-top:56px;">
+    <div style="margin-bottom:20px;">
+      <h2 style="font-size:1.35rem;font-weight:700;letter-spacing:-0.02em;"><i class="fas fa-tint"></i> Active Blood Requests</h2>
+      <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin-top:6px;">Are you a donor? Click "I Can Donate" to respond directly to a request.</p>
+    </div>
+    <div id="blood-requests-grid"
+         style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:0.85rem;">
+        <svg style="width:24px;height:24px;animation:spin 1s linear infinite;display:inline-block;margin-bottom:8px;" fill="none" viewBox="0 0 24 24">
+          <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+          <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <p>Loading requests…</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<style>
+  @media (max-width:1024px) { #donors-grid { grid-template-columns: repeat(3,1fr) !important; } }
+  @media (max-width:768px) { main { padding: 88px 24px 48px !important; } #donors-grid { grid-template-columns: repeat(2,1fr) !important; } }
+  @media (max-width:480px) { #donors-grid { grid-template-columns: 1fr !important; } }
+</style>
+
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/auth-state.js"></script>
+<script src="/js/bd-locations.js"></script>
+<script src="/js/search.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    var p   = new URLSearchParams(window.location.search);
+    var bg  = p.get('bloodGroup');
+    var d   = p.get('district');
+    var div = p.get('division');
+
+    if (bg) document.getElementById('search-blood-group').value = bg;
+
+    if (d || div) {
+      // Poll until BD_LOCATIONS is ready and cascading dropdowns are populated
+      var attempts = 0;
+      var tryFill = setInterval(function() {
+        attempts++;
+        var locs    = window.BD_LOCATIONS;
+        var divSel  = document.getElementById('search-division');
+        var distSel = document.getElementById('search-district');
+        if (!locs || !divSel || attempts > 40) { clearInterval(tryFill); return; }
+
+        // Find which division contains the district if division not supplied
+        var targetDiv = div;
+        if (!targetDiv && d) {
+          Object.keys(locs).forEach(function(dn) {
+            if (locs[dn][d]) targetDiv = dn;
+          });
+        }
+        if (!targetDiv) { clearInterval(tryFill); return; }
+
+        divSel.value = targetDiv;
+        divSel.dispatchEvent(new Event('change'));
+
+        setTimeout(function() {
+          if (d) distSel.value = d;
+          if (bg || d || div) document.getElementById('search-btn').click();
+          clearInterval(tryFill);
+        }, 150);
+      }, 50);
+    } else if (bg) {
+      setTimeout(function() {
+        document.getElementById('search-btn').click();
+      }, 200);
+    }
+  });
+</script>
+<script src="/js/toast.js"></script>
+<script src="/js/custom-alert.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Direct Request Modal -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="direct-request-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:20px;">
+  <div style="background:#141414; border:1px solid #1C1C1C; border-radius:12px; max-width:500px; width:100%; padding:32px; position:relative;">
+    
+    <!-- Close button -->
+    <button id="close-modal-btn" type="button" onclick="closeDirectRequestModal()" style="position:absolute; top:16px; right:16px; background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:24px; cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:4px; transition:all 200ms;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.4)';">
+      ×
+    </button>
+
+    <!-- Header -->
+    <div style="margin-bottom:24px;">
+      <h2 style="font-size:1.5rem; font-weight:700; color:#fff; margin-bottom:8px;">
+        <i class="fas fa-tint"></i> Request Blood Donation
+      </h2>
+      <p style="font-size:0.85rem; color:rgba(255,255,255,0.4); line-height:1.5;">
+        Send a direct request to <strong id="modal-donor-name" style="color:#DC2626;">this donor</strong>. They will receive an email notification.
+      </p>
+    </div>
+
+    <!-- Form -->
+    <form id="direct-request-form" style="display:flex; flex-direction:column; gap:16px;">
+      
+      <!-- Patient Name -->
+      <div>
+        <label style="display:block; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:8px;">
+          Patient Name <span style="color:#DC2626;">*</span>
+        </label>
+        <input type="text" id="modal-patient-name" class="input-field" placeholder="Full name of the patient" required style="width:100%; background:#1C1C1C; border:1px solid #333; color:#fff; border-radius:8px; padding:12px 16px; font-size:0.9rem; outline:none; transition:border-color 300ms; font-family:'Space Grotesk',sans-serif;" onfocus="this.style.borderColor='#DC2626'" onblur="this.style.borderColor='#333'" />
+      </div>
+
+      <!-- Hospital Name -->
+      <div>
+        <label style="display:block; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:8px;">
+          Hospital Name <span style="color:#DC2626;">*</span>
+        </label>
+        <input type="text" id="modal-hospital" class="input-field" placeholder="Name of the hospital" required style="width:100%; background:#1C1C1C; border:1px solid #333; color:#fff; border-radius:8px; padding:12px 16px; font-size:0.9rem; outline:none; transition:border-color 300ms; font-family:'Space Grotesk',sans-serif;" onfocus="this.style.borderColor='#DC2626'" onblur="this.style.borderColor='#333'" />
+      </div>
+
+      <!-- Units Needed -->
+      <div>
+        <label style="display:block; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:8px;">
+          Units Needed <span style="color:#DC2626;">*</span>
+        </label>
+        <input type="number" id="modal-units" class="input-field" min="1" max="10" value="1" required style="width:100%; background:#1C1C1C; border:1px solid #333; color:#fff; border-radius:8px; padding:12px 16px; font-size:0.9rem; outline:none; transition:border-color 300ms; font-family:'Space Grotesk',sans-serif;" onfocus="this.style.borderColor='#DC2626'" onblur="this.style.borderColor='#333'" />
+      </div>
+
+      <!-- Contact Phone -->
+      <div>
+        <label style="display:block; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:8px;">
+          Your Contact Number <span style="color:#DC2626;">*</span>
+        </label>
+        <input type="tel" id="modal-contact" class="input-field" placeholder="+880 1712-345678" required style="width:100%; background:#1C1C1C; border:1px solid #333; color:#fff; border-radius:8px; padding:12px 16px; font-size:0.9rem; outline:none; transition:border-color 300ms; font-family:'Space Grotesk',sans-serif;" onfocus="this.style.borderColor='#DC2626'" onblur="this.style.borderColor='#333'" />
+      </div>
+
+      <!-- Date Needed -->
+      <div>
+        <label style="display:block; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:8px;">
+          Date Needed <span style="color:#DC2626;">*</span>
+        </label>
+        <input type="date" id="modal-date" class="input-field" required style="width:100%; background:#1C1C1C; border:1px solid #333; color:#fff; border-radius:8px; padding:12px 16px; font-size:0.9rem; outline:none; transition:border-color 300ms; font-family:'Space Grotesk',sans-serif; color-scheme:dark;" onfocus="this.style.borderColor='#DC2626'" onblur="this.style.borderColor='#333'" />
+      </div>
+
+      <!-- Error Message -->
+      <div id="modal-error" style="display:none; background:rgba(220,38,38,0.12); border:1px solid rgba(220,38,38,0.3); color:#fca5a5; font-size:0.85rem; border-radius:8px; padding:12px 16px;">
+        <span id="modal-error-msg"></span>
+      </div>
+
+      <!-- Buttons -->
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button type="button" id="cancel-modal-btn" onclick="closeDirectRequestModal()" style="flex:1; background:transparent; color:rgba(255,255,255,0.6); border:1px solid #333; border-radius:8px; padding:12px 20px; font-size:0.9rem; font-weight:500; cursor:pointer; transition:all 300ms; font-family:'Space Grotesk',sans-serif;" onmouseover="this.style.borderColor='#555'; this.style.color='#fff';" onmouseout="this.style.borderColor='#333'; this.style.color='rgba(255,255,255,0.6)';">
+          Cancel
+        </button>
+        <button type="submit" id="confirm-request-btn" style="flex:1; background:#DC2626; color:#fff; border:none; border-radius:8px; padding:12px 28px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:background 300ms; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Space Grotesk',sans-serif;" onmouseover="this.style.background='#b91c1c'" onmouseout="this.style.background='#DC2626'">
+          <span id="submit-text">Confirm Request</span>
+          <span id="submit-spinner" style="display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:modal-spin 0.6s linear infinite;"></span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<style>
+  @keyframes modal-spin { to { transform: rotate(360deg); } }
+</style>
+
+</body>
+</html>

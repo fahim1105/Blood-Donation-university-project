@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Register — HEMO®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    .auth-page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 88px 24px 48px; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
+    input, select, button { font-family: 'Space Grotesk', sans-serif; }
+    .input-field { width:100%;background:#1C1C1C;border:1px solid #333;color:#fff;border-radius:8px;padding:12px 16px;font-size:0.9rem;outline:none;transition:border-color 300ms; }
+    .input-field:focus { border-color: #DC2626; }
+    .input-field::placeholder { color: rgba(255,255,255,0.3); }
+    select.input-field option { background: #1C1C1C; color: #fff; }
+    .btn-primary { width:100%;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:13px 16px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:background 300ms;font-family:'Space Grotesk',sans-serif; }
+    .btn-primary:hover { background: #b91c1c; }
+    label { display:block;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px; }
+    .grid-2 { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="page-auth">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="auth-page">
+<div style="width:100%;max-width:480px;">
+
+  <!-- Logo -->
+  <div style="text-align:center;margin-bottom:36px;">
+    <a href="/" style="text-decoration:none;">
+      <div style="font-size:2rem;font-weight:700;color:#DC2626;letter-spacing:-0.03em;">HEMO®</div>
+    </a>
+    <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin-top:8px;">Join the community of donors</p>
+  </div>
+
+  <!-- Card -->
+  <div style="background:#141414;border:1px solid #1C1C1C;border-radius:12px;padding:36px;">
+
+    <!-- Alerts -->
+    <div id="reg-error" class="hidden" style="background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.3);color:#fca5a5;font-size:0.85rem;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
+      <span id="reg-error-msg"></span>
+    </div>
+    <div id="reg-success" class="hidden" style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:#86efac;font-size:0.85rem;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
+      <span id="reg-success-msg"></span>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div id="progress-bar" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px;">
+      <div id="progress-1" class="progress-dot active">1</div>
+      <div class="progress-line"></div>
+      <div id="progress-2" class="progress-dot">2</div>
+      <div class="progress-line"></div>
+      <div id="progress-3" class="progress-dot">3</div>
+    </div>
+
+    <!-- STEP 1: Basic Info -->
+    <div id="step-1">
+      <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:18px;text-align:center;color:rgba(255,255,255,0.8);"><i class="fas fa-edit"></i> Basic Information</h3>
+      <form id="register-form-step1" style="display:flex;flex-direction:column;gap:18px;">
+        <div>
+          <label for="reg-name">Full Name <span style="color:#DC2626;">*</span></label>
+          <input type="text" id="reg-name" class="input-field" placeholder="Enter your full name" required/>
+        </div>
+        <div>
+          <label for="reg-email">Email Address <span style="color:#DC2626;">*</span></label>
+          <input type="email" id="reg-email" class="input-field" placeholder="you@example.com" required/>
+        </div>
+        <div>
+          <label for="reg-phone">Phone Number <span style="color:#DC2626;">*</span></label>
+          <input type="tel" id="reg-phone" class="input-field" placeholder="+880 1xxx-xxxxxx" required/>
+        </div>
+        <button type="submit" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;">
+          Next: Medical Info →
+        </button>
+      </form>
+    </div>
+
+    <!-- STEP 2: Medical & Location Info -->
+    <div id="step-2" class="hidden">
+      <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:18px;text-align:center;color:rgba(255,255,255,0.8);">🩸 Medical & Location</h3>
+      <form id="register-form-step2" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="grid-2">
+          <div>
+            <label for="reg-blood-group">Blood Group <span style="color:#DC2626;">*</span></label>
+            <select id="reg-blood-group" class="input-field" required>
+              <option value="">Select</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+            </select>
+          </div>
+          <div>
+            <label for="reg-gender">Gender <span style="color:#DC2626;">*</span></label>
+            <select id="reg-gender" class="input-field" required>
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="reg-dob">Date of Birth <span style="color:#DC2626;">*</span></label>
+          <input type="date" id="reg-dob" class="input-field" required/>
+        </div>
+        <div style="background:rgba(220,38,38,0.05);border:1px solid rgba(220,38,38,0.2);border-radius:8px;padding:12px;margin-top:4px;">
+          <p style="font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:10px;font-weight:600;"><i class="fas fa-map-marker-alt"></i> Current Location</p>
+          <div class="grid-2" style="gap:12px;">
+            <div>
+              <label for="reg-division">Division</label>
+              <select id="reg-division" class="input-field">
+                <option value="">Select</option>
+              </select>
+            </div>
+            <div>
+              <label for="reg-district">District</label>
+              <select id="reg-district" class="input-field">
+                <option value="">Select</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <label for="reg-upazila">Upazila</label>
+            <select id="reg-upazila" class="input-field">
+              <option value="">Select</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="reg-last-donation">Last Blood Donation Date (Optional)</label>
+          <input type="date" id="reg-last-donation" class="input-field"/>
+          <p style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:6px;">Leave blank if you've never donated before</p>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button type="button" id="back-to-step1" class="btn-secondary" style="flex:1;background:transparent;color:#fff;border:1px solid #333;border-radius:8px;padding:13px 16px;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 300ms;">
+            ← Back
+          </button>
+          <button type="submit" class="btn-primary" style="flex:2;">
+            Next: Set Password →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- STEP 3: Password & Agreement -->
+    <div id="step-3" class="hidden">
+      <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:18px;text-align:center;color:rgba(255,255,255,0.8);"><i class="fas fa-lock"></i> Secure Your Account</h3>
+      <form id="register-form-step3" style="display:flex;flex-direction:column;gap:18px;">
+        <div>
+          <label for="reg-password">Password <span style="color:#DC2626;">*</span></label>
+          <div style="position:relative;">
+            <input type="password" id="reg-password" class="input-field" placeholder="Minimum 6 characters" required minlength="6" style="padding-right:45px;"/>
+            <button type="button" id="toggle-password" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:1.2rem;padding:4px;transition:color 200ms;" title="Show password">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label for="reg-confirm-password">Confirm Password <span style="color:#DC2626;">*</span></label>
+          <div style="position:relative;">
+            <input type="password" id="reg-confirm-password" class="input-field" placeholder="Re-enter password" required style="padding-right:45px;"/>
+            <button type="button" id="toggle-confirm-password" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:1.2rem;padding:4px;transition:color 200ms;" title="Show password">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <label style="display:flex;align-items:start;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:0.85rem;color:rgba(255,255,255,0.6);font-weight:400;">
+            <input type="checkbox" id="reg-agree" required style="margin-top:3px;width:18px;height:18px;cursor:pointer;"/>
+            <span>I agree to the <a href="/privacy-policy" style="color:#DC2626;text-decoration:none;font-weight:600;">Privacy Policy</a> and <a href="/terms-conditions" style="color:#DC2626;text-decoration:none;font-weight:600;">Terms & Conditions</a></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button type="button" id="back-to-step2" class="btn-secondary" style="flex:1;background:transparent;color:#fff;border:1px solid #333;border-radius:8px;padding:13px 16px;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 300ms;">
+            ← Back
+          </button>
+          <button type="submit" id="reg-submit-btn" class="btn-primary" style="flex:2;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <svg id="reg-spinner" style="display:none;width:16px;height:16px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+              <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path style="opacity:0.75;" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span id="reg-submit-text">Complete Registration</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <p style="text-align:center;font-size:0.85rem;color:rgba(255,255,255,0.4);margin-top:24px;">
+      Already have an account?
+      <a href="/login" style="color:#DC2626;font-weight:600;text-decoration:none;">Sign in</a>
+    </p>
+  </div>
+</div>
+</div>
+
+<style>
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.4); }
+  .btn-secondary:hover { border-color: #555 !important; background: rgba(255,255,255,0.04) !important; }
+  .progress-dot { width:36px;height:36px;border-radius:50%;background:#1C1C1C;border:2px solid #333;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.4);transition:all 300ms; }
+  .progress-dot.active { background:#DC2626;border-color:#DC2626;color:#fff; }
+  .progress-dot.completed { background:rgba(34,197,94,0.15);border-color:#22c55e;color:#86efac; }
+  .progress-line { width:60px;height:2px;background:#333;transition:background 300ms; }
+  .progress-line.completed { background:#22c55e; }
+</style>
+
+<script src="/js/bd-locations.js"></script>
+<script src="/js/toast.js"></script>
+<script src="/js/redirect-handler.js"></script>
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/auth-state.js"></script>
+<script type="module" src="/js/register.js"></script>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

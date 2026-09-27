@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>My Requests — HEMO®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="page-main" style="padding:88px 72px 72px;max-width:1280px;margin:0 auto;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:16px;">
+    <div>
+      <h1 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;letter-spacing:-0.03em;">My Blood Requests</h1>
+      <p style="color:rgba(255,255,255,0.4);margin-top:8px;font-size:0.95rem;">Track and manage your requests</p>
+    </div>
+    <a href="/request-blood"
+       style="background:#DC2626;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:0.85rem;font-weight:600;font-family:'Space Grotesk',sans-serif;transition:background 300ms;"
+       onmouseover="this.style.background='#b91c1c'" onmouseout="this.style.background='#DC2626'">
+      + New Request
+    </a>
+  </div>
+
+  <!-- Auth Guard -->
+  <div id="my-req-auth-guard" class="hidden auth-guard-panel">
+    <div style="font-size:4rem;margin-bottom:16px;opacity:0.3;"><i class="fas fa-lock"></i></div>
+    <p style="font-weight:600;font-size:1.25rem;margin-bottom:8px;">Sign in required</p>
+    <p style="color:rgba(255,255,255,0.4);font-size:0.9rem;margin-bottom:24px;">Please login to view your requests.</p>
+    <a href="/login"
+       style="background:#DC2626;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;font-size:0.9rem;font-family:'Space Grotesk',sans-serif;">
+      Go to Login
+    </a>
+  </div>
+
+  <!-- Requests container (populated by JS) -->
+  <div id="my-requests-container">
+    <div style="display:flex;justify-content:center;padding:80px 0;">
+      <svg style="width:36px;height:36px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+        <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+        <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+    </div>
+  </div>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<style>
+  @media (max-width:768px) { main { padding: 88px 24px 48px !important; } }
+</style>
+
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/auth-state.js"></script>
+<script type="module" src="/js/my-requests.js"></script>
+<script src="/js/toast.js"></script>
+<script src="/js/custom-alert.js"></script>
+</body>
+</html>

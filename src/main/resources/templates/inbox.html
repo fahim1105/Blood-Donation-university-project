@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inbox - HEMO® Blood Donation</title>
+  <link rel="stylesheet" href="/css/hemo.css"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; }
+    main { max-width: 1200px; margin: 0 auto; padding: 100px 24px 60px; }
+    
+    .inbox-header { margin-bottom: 32px; }
+    .inbox-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    .inbox-header p { color: rgba(255,255,255,0.5); font-size: 0.95rem; }
+    
+    .inbox-stats { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+    .stat-card { background: #1C1C1C; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 140px; }
+    .stat-card .label { font-size: 0.75rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; }
+    .stat-card.pending .value { color: #fbbf24; }
+    .stat-card.accepted .value { color: #86efac; }
+    .stat-card.declined .value { color: #fca5a5; }
+    
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid #2a2a2a; padding-bottom: 0; }
+    .tab-btn { background: transparent; border: none; color: rgba(255,255,255,0.4); padding: 12px 20px; cursor: pointer; font-size: 0.9rem; font-weight: 600; border-bottom: 2px solid transparent; transition: all 200ms; font-family: 'Space Grotesk', sans-serif; }
+    .tab-btn:hover { color: rgba(255,255,255,0.7); }
+    .tab-btn.active { color: #DC2626; border-bottom-color: #DC2626; }
+    
+    .inbox-list { display: flex; flex-direction: column; gap: 16px; }
+    .request-card { background: #1C1C1C; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; transition: border-color 200ms; }
+    .request-card:hover { border-color: #3a3a3a; }
+    
+    .request-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .requester-info { display: flex; align-items: center; }
+    .requester-name { font-size: 1.1rem; font-weight: 600; color: white; }
+    .request-date { font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+    
+    .request-body { margin-bottom: 20px; }
+    .blood-info { display: flex; gap: 12px; margin-bottom: 16px; }
+    .blood-badge, .units-badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(220,38,38,0.1); color: #fca5a5; border-radius: 20px; font-weight: 600; font-size: 0.9rem; }
+    .units-badge { background: rgba(34,197,94,0.1); color: #86efac; }
+    
+    .request-details { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .detail-row { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+    .detail-row i { color: rgba(255,255,255,0.4); width: 16px; }
+    
+    .request-message { background: rgba(220,38,38,0.05); border-left: 3px solid #dc3545; padding: 12px 16px; margin-bottom: 16px; border-radius: 4px; }
+    .request-message i { color: #dc3545; margin-right: 8px; }
+    .request-message p { margin: 0; color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+    
+    .response-message { background: rgba(34,197,94,0.05); border-left: 3px solid #4caf50; padding: 12px 16px; margin-bottom: 16px; border-radius: 4px; }
+    .response-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; color: #4caf50; font-weight: 600; }
+    .response-date { font-size: 0.75rem; color: rgba(255,255,255,0.4); font-weight: 400; }
+    .response-message p { margin: 0; color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+    
+    .request-actions { display: flex; gap: 12px; align-items: center; }
+    .btn-accept, .btn-decline, .btn-call { padding: 12px 24px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all 200ms; font-family: 'Space Grotesk', sans-serif; }
+    .btn-accept { background: #DC2626; color: #fff; box-shadow: 0 4px 14px rgba(220,38,38,0.3); }
+    .btn-accept:hover { background: #b91c1c; box-shadow: 0 6px 20px rgba(220,38,38,0.4); }
+    .btn-decline { background: transparent; color: rgba(255,255,255,0.5); border: 1px solid #2a2a2a; }
+    .btn-decline:hover { color: #fff; border-color: #3a3a3a; }
+    .btn-call { background: rgba(34,197,94,0.1); color: #86efac; border: 1px solid rgba(34,197,94,0.2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    
+    .request-status { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .request-status.pending { background: rgba(251,191,36,0.1); color: #fbbf24; }
+    .request-status.accepted { background: rgba(34,197,94,0.1); color: #86efac; }
+    .request-status.declined { background: rgba(220,38,38,0.1); color: #fca5a5; }
+    
+    .empty-state { text-align: center; padding: 80px 20px; }
+    .empty-state .icon { font-size: 4rem; opacity: 0.2; margin-bottom: 16px; }
+    .empty-state .message { font-size: 0.95rem; color: rgba(255,255,255,0.4); }
+    
+    /* Custom alert overlay for decline message prompt */
+    .custom-alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100000;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .custom-alert-box {
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+    
+    @media (max-width: 768px) {
+      main { padding: 88px 16px 40px; }
+      .inbox-header h1 { font-size: 1.5rem; }
+      .request-details { grid-template-columns: 1fr; }
+      .request-actions { flex-direction: column; }
+      .btn-accept, .btn-decline, .btn-call { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main>
+  <div class="inbox-header">
+    <h1><i class="fas fa-inbox" style="margin-right: 12px;"></i>Inbox</h1>
+    <p>Blood donation requests sent directly to you</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="inbox-stats">
+    <div class="stat-card pending">
+      <div class="label"><i class="fas fa-clock"></i> Pending</div>
+      <div class="value" id="stat-pending">0</div>
+    </div>
+    <div class="stat-card accepted">
+      <div class="label"><i class="fas fa-check-circle"></i> Accepted</div>
+      <div class="value" id="stat-accepted">0</div>
+    </div>
+    <div class="stat-card declined">
+      <div class="label"><i class="fas fa-times-circle"></i> Declined</div>
+      <div class="value" id="stat-declined">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label"><i class="fas fa-chart-bar"></i> Total</div>
+      <div class="value" id="stat-total">0</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-filter="PENDING"><i class="fas fa-clock"></i> Pending</button>
+    <button class="tab-btn" data-filter="ACCEPTED"><i class="fas fa-check-circle"></i> Accepted</button>
+    <button class="tab-btn" data-filter="DECLINED"><i class="fas fa-times-circle"></i> Declined</button>
+    <button class="tab-btn" data-filter="ALL"><i class="fas fa-list"></i> All</button>
+  </div>
+
+  <!-- Request List -->
+  <div class="inbox-list" id="requests-container">
+    <div class="empty-state">
+      <i class="fas fa-inbox" style="font-size: 64px; color: #333; margin-bottom: 16px;"></i>
+      <div class="message">Loading your inbox...</div>
+    </div>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="/js/redirect-handler.js"></script>
+<script src="/js/toast.js"></script>
+<script src="/js/custom-alert.js"></script>
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/auth-state.js"></script>
+<script src="/js/inbox.js"></script>
+
+</body>
+</html>

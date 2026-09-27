@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Admin Dashboard — HEMO®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
+    button, a { font-family: 'Space Grotesk', sans-serif; }
+
+    .admin-topbar { display: none; }
+    .admin-layout { display: flex; flex: 1; padding-top: 64px; }
+    .admin-sidebar { width: 220px; background: #0A0A0A; border-right: 1px solid #1C1C1C; padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; flex-shrink: 0; }
+    .admin-tab-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 14px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-size: 0.85rem; font-weight: 500; text-align: left; transition: background 200ms, color 200ms; color: rgba(255,255,255,0.5); }
+    .admin-tab-btn.active { background: rgba(220,38,38,0.12); color: #DC2626; }
+    .admin-tab-btn:not(.active):hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .admin-main { flex: 1; padding: 36px; overflow-x: auto; }
+    .card { background: #141414; border: 1px solid #1C1C1C; border-radius: 12px; }
+    .stat-card { background: #141414; border: 1px solid #1C1C1C; border-radius: 12px; padding: 24px; display: flex; align-items: center; gap: 16px; }
+    .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead tr { border-bottom: 1px solid #1C1C1C; }
+    th { padding: 0 12px 12px; text-align: left; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); white-space: nowrap; }
+    td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+    .badge-pending { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-fulfilled { background: rgba(34,197,94,0.12); color: #86efac; }
+    .badge-other { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
+    .badge-active { background: rgba(59,130,246,0.12); color: #93c5fd; }
+    .badge-deactivated { background: rgba(220,38,38,0.12); color: #fca5a5; }
+    .badge-yes { background: rgba(34,197,94,0.12); color: #86efac; }
+    .badge-no { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+    .blood-circle { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #DC2626; color: #fff; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+    .action-btn { background: none; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; transition: background 200ms; }
+    .action-btn-green { color: #86efac; } .action-btn-green:hover { background: rgba(34,197,94,0.1); }
+    .action-btn-red { color: #fca5a5; } .action-btn-red:hover { background: rgba(220,38,38,0.12); }
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr; } .admin-sidebar { display: none; } }
+    .filter-tab { background:transparent;border:1px solid #333;color:rgba(255,255,255,0.5);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all 200ms; }
+    .filter-tab.active { background:rgba(220,38,38,0.15);border-color:#DC2626;color:#DC2626; }
+
+    /* ── Pagination ──────────────────────────────────────── */
+    .pagination { display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;flex-wrap:wrap; }
+    .pg-btn { background:transparent;border:1px solid #333;color:rgba(255,255,255,0.5);padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all 200ms;min-width:36px; }
+    .pg-btn:hover:not(:disabled) { border-color:#DC2626;color:#DC2626; }
+    .pg-btn.active { background:rgba(220,38,38,0.15);border-color:#DC2626;color:#DC2626;font-weight:700; }
+    .pg-btn:disabled { opacity:0.3;cursor:not-allowed; }
+    .pg-info { font-size:0.75rem;color:rgba(255,255,255,0.3);margin:0 8px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .tbl-spinner { display:flex;justify-content:center;padding:48px 0; }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div style="padding:4px 14px 16px;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);">Admin Panel</div>
+    <button class="admin-tab-btn active" id="btn-tab-overview"  onclick="showAdminTab('tab-overview')"><i class="fas fa-chart-bar"></i> Overview</button>
+    <button class="admin-tab-btn"        id="btn-tab-requests" onclick="showAdminTab('tab-requests')"><i class="fas fa-tint"></i> Blood Requests</button>
+    <button class="admin-tab-btn"        id="btn-tab-users"    onclick="showAdminTab('tab-users')"><i class="fas fa-users"></i> Users / Donors</button>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- ─── OVERVIEW ──────────────────────────────────────── -->
+    <div id="tab-overview" class="admin-tab-content">
+      <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:28px;letter-spacing:-0.02em;">Dashboard Overview</h1>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(220,38,38,0.1);"><i class="fas fa-users"></i></div>
+          <div>
+            <div id="stat-donors" style="font-size:1.8rem;font-weight:700;letter-spacing:-0.03em;">—</div>
+            <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:2px;">Total Donors</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(245,158,11,0.1);"><i class="fas fa-clock"></i></div>
+          <div>
+            <div id="stat-pending" style="font-size:1.8rem;font-weight:700;letter-spacing:-0.03em;">—</div>
+            <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:2px;">Pending Requests</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(34,197,94,0.1);"><i class="fas fa-check-circle"></i></div>
+          <div>
+            <div id="stat-fulfilled" style="font-size:1.8rem;font-weight:700;letter-spacing:-0.03em;">—</div>
+            <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:2px;">Fulfilled</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent requests (first page, no pagination needed for overview) -->
+      <div class="card" style="padding:24px;">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:20px;color:rgba(255,255,255,0.7);">Recent Requests</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th><th>Blood</th><th>Hospital</th><th>District</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="overview-requests-tbody">
+              <tr><td colspan="6" class="tbl-spinner">
+                <svg style="width:24px;height:24px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+                  <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+                  <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── REQUESTS TAB ───────────────────────────────────── -->
+    <div id="tab-requests" class="admin-tab-content" style="display:none;">
+      <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:28px;letter-spacing:-0.02em;">Blood Requests Management</h1>
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" id="request-filter-tabs">
+          <button class="filter-tab active" data-filter="ALL"       onclick="loadRequestsPage(0,'ALL')">All</button>
+          <button class="filter-tab"        data-filter="PENDING"   onclick="loadRequestsPage(0,'PENDING')">Pending</button>
+          <button class="filter-tab"        data-filter="FULFILLED" onclick="loadRequestsPage(0,'FULFILLED')">Fulfilled</button>
+          <button class="filter-tab"        data-filter="CANCELLED" onclick="loadRequestsPage(0,'CANCELLED')">Cancelled</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th><th>Blood</th><th>Hospital / District</th>
+                <th>Units</th><th>Contact</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="requests-tbody">
+              <tr><td colspan="7" class="tbl-spinner">
+                <svg style="width:24px;height:24px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+                  <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+                  <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="requests-pagination" class="pagination"></div>
+      </div>
+    </div>
+
+    <!-- ─── USERS TAB ──────────────────────────────────────── -->
+    <div id="tab-users" class="admin-tab-content" style="display:none;">
+      <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:28px;letter-spacing:-0.02em;">Users &amp; Donors</h1>
+      <div class="card" style="padding:24px;">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Email</th><th>Blood</th><th>District</th>
+                <th>Available</th><th>Role</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr><td colspan="8" class="tbl-spinner">
+                <svg style="width:24px;height:24px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+                  <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="#DC2626" stroke-width="4"></circle>
+                  <path style="opacity:0.75;" fill="#DC2626" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="users-pagination" class="pagination"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────
+var currentRequestFilter = 'ALL';
+var currentRequestPage   = 0;
+var currentUsersPage     = 0;
+var totalRequestPages    = 0;
+var totalUsersPages      = 0;
+var PAGE_SIZE            = 10;
+
+// ── Auth guard ────────────────────────────────────────────
+(async function() {
+  var token = localStorage.getItem('hemo_id_token');
+  if (!token) { window.location.href = '/'; return; }
+
+  // First check cached role (fast, works even when MongoDB is down)
+  var cachedRole = localStorage.getItem('hemo_user_role');
+  if (cachedRole && cachedRole !== 'ADMIN') { window.location.href = '/'; return; }
+
+  try {
+    var res = await fetch('/api/v1/users/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (res.ok) {
+      var user = await res.json();
+      if (user.role !== 'ADMIN') { window.location.href = '/'; return; }
+      localStorage.setItem('hemo_user_role', user.role);
+      localStorage.setItem('hemo_user_name', user.name || '');
+    } else if (res.status === 503) {
+      // MongoDB unavailable — allow if cached role is ADMIN
+      if (cachedRole !== 'ADMIN') { window.location.href = '/'; return; }
+      // Show a subtle warning that data may be stale
+      console.warn('MongoDB unavailable — using cached session.');
+    } else {
+      // 401, 403, etc — redirect
+      window.location.href = '/'; return;
+    }
+  } catch(e) {
+    // Network error — allow if cached role is ADMIN
+    if (cachedRole !== 'ADMIN') { window.location.href = '/'; return; }
+  }
+
+  // Proceed to load dashboard
+  refreshStats();
+  showAdminTab('tab-overview');
+})();
+
+async function refreshStats() {
+  try {
+    var res = await fetch('/api/v1/stats');
+    if (res.ok) {
+      var s = await res.json();
+      var d = document.getElementById('stat-donors');
+      var p = document.getElementById('stat-pending');
+      var f = document.getElementById('stat-fulfilled');
+      if (d) d.textContent = s.totalDonors || 0;
+      if (p) p.textContent = s.pendingRequests || 0;
+      if (f) f.textContent = s.livesSaved || 0;
+    }
+  } catch(_) {}
+}
+
+// ── Tab navigation ────────────────────────────────────────
+function showAdminTab(id) {
+  document.querySelectorAll('.admin-tab-content').forEach(function(t) { t.style.display = 'none'; });
+  document.querySelectorAll('.admin-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  var el  = document.getElementById(id);
+  var btn = document.getElementById('btn-' + id);
+  if (el)  el.style.display = 'block';
+  if (btn) btn.classList.add('active');
+
+  // Lazy-load tables when tab is first opened
+  if (id === 'tab-overview'  && !document.getElementById('overview-requests-tbody').dataset.loaded) loadOverviewRequests();
+  if (id === 'tab-requests'  && !document.getElementById('requests-tbody').dataset.loaded) loadRequestsPage(0, 'ALL');
+  if (id === 'tab-users'     && !document.getElementById('users-tbody').dataset.loaded) loadUsersPage(0);
+}
+
+// showAdminTab is called by the auth guard above after verification
+
+// ── Helpers ───────────────────────────────────────────────
+function getHeaders() {
+  var t = localStorage.getItem('hemo_id_token');
+  return t ? { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function statusBadge(st) {
+  if (st==='PENDING')   return '<span class="badge badge-pending">PENDING</span>';
+  if (st==='FULFILLED') return '<span class="badge badge-fulfilled">FULFILLED</span>';
+  return '<span class="badge badge-other">' + esc(st) + '</span>';
+}
+
+// ── Pagination builder ────────────────────────────────────
+function buildPagination(containerId, currentPage, totalPages, onPageClick) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+  var html = '';
+  html += '<button class="pg-btn" onclick="' + onPageClick + '(' + (currentPage - 1) + ')" ' + (currentPage === 0 ? 'disabled' : '') + '>←</button>';
+
+  var start = Math.max(0, currentPage - 2);
+  var end   = Math.min(totalPages - 1, currentPage + 2);
+
+  if (start > 0) {
+    html += '<button class="pg-btn" onclick="' + onPageClick + '(0)">1</button>';
+    if (start > 1) html += '<span class="pg-info">…</span>';
+  }
+
+  for (var i = start; i <= end; i++) {
+    html += '<button class="pg-btn' + (i === currentPage ? ' active' : '') + '" onclick="' + onPageClick + '(' + i + ')">' + (i + 1) + '</button>';
+  }
+
+  if (end < totalPages - 1) {
+    if (end < totalPages - 2) html += '<span class="pg-info">…</span>';
+    html += '<button class="pg-btn" onclick="' + onPageClick + '(' + (totalPages - 1) + ')">' + totalPages + '</button>';
+  }
+
+  html += '<button class="pg-btn" onclick="' + onPageClick + '(' + (currentPage + 1) + ')" ' + (currentPage >= totalPages - 1 ? 'disabled' : '') + '>→</button>';
+  html += '<span class="pg-info">Page ' + (currentPage + 1) + ' of ' + totalPages + '</span>';
+
+  container.innerHTML = html;
+}
+
+// ── Overview ──────────────────────────────────────────────
+async function loadOverviewRequests() {
+  try {
+    var res = await fetch('/api/v1/admin/requests?page=0&size=8&status=ALL', { headers: getHeaders() });
+    if (!res.ok) throw new Error();
+    var data = await res.json();
+    var tbody = document.getElementById('overview-requests-tbody');
+    tbody.dataset.loaded = '1';
+    if (!data.content || !data.content.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;">No requests found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.content.map(function(r) {
+      return '<tr>' +
+        '<td style="font-weight:500;">'  + esc(r.patientName)  + '</td>' +
+        '<td><span class="blood-circle">' + esc(r.bloodGroup)  + '</span></td>' +
+        '<td style="color:rgba(255,255,255,0.5);font-size:0.8rem;">' + esc(r.hospitalName) + '</td>' +
+        '<td style="color:rgba(255,255,255,0.5);font-size:0.8rem;">' + esc(r.district)     + '</td>' +
+        '<td>' + statusBadge(r.status) + '</td>' +
+        '<td><button class="action-btn action-btn-red" onclick="deleteRequest(\'' + esc(r.id) + '\')"><i class="fas fa-trash-alt"></i> Delete</button></td>' +
+        '</tr>';
+    }).join('');
+  } catch(_) {
+    document.getElementById('overview-requests-tbody').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;">Failed to load.</td></tr>';
+  }
+}
+
+// ── Requests paged ────────────────────────────────────────
+window.loadRequestsPage = async function(page, filter) {
+  if (filter !== undefined) {
+    currentRequestFilter = filter;
+    // Update filter tab styles
+    document.querySelectorAll('.filter-tab').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === currentRequestFilter);
+    });
+  }
+  currentRequestPage = page;
+
+  var tbody = document.getElementById('requests-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:rgba(255,255,255,0.3);">Loading…</td></tr>';
+
+  try {
+    var url = '/api/v1/admin/requests?page=' + page + '&size=' + PAGE_SIZE + '&status=' + currentRequestFilter;
+    var res = await fetch(url, { headers: getHeaders() });
+    if (!res.ok) throw new Error();
+    var data = await res.json();
+    tbody.dataset.loaded = '1';
+    totalRequestPages = data.totalPages;
+
+    if (!data.content || !data.content.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;">No requests found.</td></tr>';
+      document.getElementById('requests-pagination').innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = data.content.map(function(r) {
+      var cancelBtn = r.status === 'PENDING'
+        ? '<button class="action-btn" style="color:#fbbf24;" onclick="cancelRequest(\'' + esc(r.id) + '\')">✕</button>'
+        : '';
+      return '<tr>' +
+        '<td style="font-weight:500;">' + esc(r.patientName) + '</td>' +
+        '<td><span class="blood-circle">' + esc(r.bloodGroup) + '</span></td>' +
+        '<td style="font-size:0.8rem;"><div style="color:rgba(255,255,255,0.7);">' + esc(r.hospitalName) + '</div>' +
+             '<div style="color:rgba(255,255,255,0.35);margin-top:2px;">' + esc(r.district) + '</div></td>' +
+        '<td style="color:#DC2626;font-weight:700;">' + r.unitsNeeded + '</td>' +
+        '<td style="color:rgba(255,255,255,0.5);font-size:0.8rem;">' + esc(r.contactNumber) + '</td>' +
+        '<td>' + statusBadge(r.status) + '</td>' +
+        '<td><div style="display:flex;gap:4px;">' +
+          '<button class="action-btn action-btn-green" onclick="markFulfilled(\'' + esc(r.id) + '\')"><i class="fas fa-check"></i></button>' +
+          cancelBtn +
+          '<button class="action-btn action-btn-red" onclick="deleteRequest(\'' + esc(r.id) + '\')"><i class="fas fa-trash"></i></button>' +
+        '</div></td>' +
+        '</tr>';
+    }).join('');
+
+    buildPagination('requests-pagination', currentRequestPage, totalRequestPages, 'loadRequestsPage');
+  } catch(_) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;">Failed to load.</td></tr>';
+  }
+};
+
+// ── Users paged ───────────────────────────────────────────
+window.loadUsersPage = async function(page) {
+  currentUsersPage = page;
+  var tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:rgba(255,255,255,0.3);">Loading…</td></tr>';
+
+  try {
+    var res = await fetch('/api/v1/admin/users?page=' + page + '&size=' + PAGE_SIZE, { headers: getHeaders() });
+    if (!res.ok) throw new Error();
+    var data = await res.json();
+    tbody.dataset.loaded = '1';
+    totalUsersPages = data.totalPages;
+
+    if (!data.content || !data.content.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;">No users found.</td></tr>';
+      document.getElementById('users-pagination').innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = data.content.map(function(u) {
+      var roleOpts = ['DONOR','USER','ADMIN'].map(function(r) {
+        return '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + r + '</option>';
+      }).join('');
+
+      var actionBtn = u.active
+        ? '<button class="action-btn action-btn-red" onclick="deactivateUser(\'' + esc(u.id) + '\')"><i class="fas fa-ban"></i> Deactivate</button>'
+        : '<button class="action-btn action-btn-green" onclick="reactivateUser(\'' + esc(u.id) + '\')"><i class="fas fa-redo"></i> Reactivate</button>';
+
+      return '<tr>' +
+        '<td style="font-weight:500;">' + esc(u.name||'—') + '</td>' +
+        '<td style="color:rgba(255,255,255,0.4);font-size:0.8rem;">' + esc(u.email||'—') + '</td>' +
+        '<td><span class="blood-circle" style="background:rgba(220,38,38,0.2);color:#DC2626;">' +
+          esc(u.bloodGroup||'?') + '</span></td>' +
+        '<td style="color:rgba(255,255,255,0.5);font-size:0.8rem;">' + esc(u.district||'—') + '</td>' +
+        '<td>' + (u.available ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>') + '</td>' +
+        '<td><select class="role-select" data-id="' + esc(u.id) + '" data-original="' + esc(u.role) + '" ' +
+          'onchange="changeRole(this)" ' +
+          'style="background:#1C1C1C;border:1px solid #333;color:#fff;border-radius:6px;padding:4px 8px;font-size:0.8rem;font-family:\'Space Grotesk\',sans-serif;cursor:pointer;">' +
+          roleOpts + '</select></td>' +
+        '<td>' + (u.active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-deactivated">Deactivated</span>') + '</td>' +
+        '<td>' + actionBtn + '</td>' +
+        '</tr>';
+    }).join('');
+
+    buildPagination('users-pagination', currentUsersPage, totalUsersPages, 'loadUsersPage');
+  } catch(_) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;">Failed to load.</td></tr>';
+  }
+};
+
+// ── Actions ───────────────────────────────────────────────
+async function deleteRequest(id) {
+  if (!confirm('Delete this request?')) return;
+  var r = await fetch('/api/v1/admin/requests/' + id, { method: 'DELETE', headers: getHeaders() });
+  if (r.ok) {
+    loadOverviewRequests();
+    loadRequestsPage(currentRequestPage, currentRequestFilter);
+  } else { alert('Failed to delete request.'); }
+}
+
+async function markFulfilled(id) {
+  var r = await fetch('/api/v1/requests/' + id + '/status', {
+    method: 'PATCH', headers: getHeaders(), body: JSON.stringify({ status: 'FULFILLED' })
+  });
+  if (r.ok) loadRequestsPage(currentRequestPage, currentRequestFilter);
+  else alert('Failed to update status.');
+}
+
+async function cancelRequest(id) {
+  if (!confirm('Cancel this request?')) return;
+  var r = await fetch('/api/v1/requests/' + id + '/status', {
+    method: 'PATCH', headers: getHeaders(), body: JSON.stringify({ status: 'CANCELLED' })
+  });
+  if (r.ok) loadRequestsPage(currentRequestPage, currentRequestFilter);
+  else alert('Failed to cancel request.');
+}
+
+async function deactivateUser(id) {
+  if (!confirm('Deactivate this user?')) return;
+  var r = await fetch('/api/v1/admin/users/' + id + '/deactivate', { method: 'PATCH', headers: getHeaders() });
+  if (r.ok) loadUsersPage(currentUsersPage);
+  else alert('Failed to deactivate user.');
+}
+
+async function reactivateUser(id) {
+  if (!confirm('Reactivate this user?')) return;
+  var r = await fetch('/api/v1/admin/users/' + id + '/reactivate', { method: 'PATCH', headers: getHeaders() });
+  if (r.ok) loadUsersPage(currentUsersPage);
+  else alert('Failed to reactivate user.');
+}
+
+async function changeRole(sel) {
+  var id   = sel.dataset.id;
+  var role = sel.value;
+  var r = await fetch('/api/v1/admin/users/' + id + '/role', {
+    method: 'PATCH', headers: getHeaders(), body: JSON.stringify({ role: role })
+  });
+  if (!r.ok) { alert('Failed to change role.'); sel.value = sel.dataset.original; }
+  else { sel.dataset.original = role; }
+}
+</script>
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/auth-state.js"></script>
+<script src="/js/toast.js"></script>
+</body>
+</html>
