@@ -2,9 +2,8 @@
 // profile.js — User profile management
 // ══════════════════════════════════════════════════════════
 
-import { auth, storage } from "./firebase-config.js";
+import { auth } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 let currentUser  = null;
 let originalData = {};
@@ -24,7 +23,6 @@ onAuthStateChanged(auth, async (user) => {
   setupNav();
   await loadProfile(token);
   setupToggleListener();
-  setupPhotoUpload();
   await loadRequests(token);
   await loadDonationHistory(token);
   setupDonationHistoryForm(token);
@@ -327,75 +325,6 @@ window.changeStatus = async function(id, status) {
   });
   if (res.ok) await loadRequests(token);
 };
-
-// ── Profile Photo Upload ──────────────────────────────────
-
-function setupPhotoUpload() {
-  const input   = document.getElementById('photo-file-input');
-  const spinner = document.getElementById('avatar-spinner');
-  const wrap    = document.getElementById('avatar-wrap');
-  if (!input) return;
-
-  input.addEventListener('change', async function() {
-    const file = this.files[0];
-    if (!file) return;
-
-    // Validate: image only, max 5MB
-    if (!file.type.startsWith('image/')) {
-      window.toast?.('Please select an image file.', 'error');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      window.toast?.('Image must be smaller than 5MB.', 'error');
-      return;
-    }
-
-    if (spinner) spinner.style.display = 'flex';
-    if (wrap) wrap.style.cursor = 'not-allowed';
-
-    try {
-      const token      = localStorage.getItem('hemo_id_token');
-      const uid        = currentUser?.uid || 'unknown';
-      const timestamp  = Date.now();
-      const ext        = file.name.split('.').pop();
-      const path       = 'profile-photos/' + uid + '/' + timestamp + '.' + ext;
-
-      const storageRef = ref(storage, path);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      await new Promise((resolve, reject) => {
-        uploadTask.on('state_changed', null, reject, resolve);
-      });
-
-      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-      // Save URL to backend via PUT /api/v1/users/me
-      const res = await fetch('/api/v1/users/me', {
-        method: 'PUT',
-        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profilePhotoUrl: downloadURL })
-      });
-
-      if (!res.ok) throw new Error('Failed to save photo URL');
-
-      // Update UI
-      setAvatarPhoto(downloadURL);
-      localStorage.setItem('hemo_user_photo', downloadURL);
-      if (typeof window._navSetProfilePhoto === 'function') {
-        window._navSetProfilePhoto(downloadURL);
-      }
-      window.toast?.('Profile photo updated!', 'success');
-
-    } catch (err) {
-      console.error('Photo upload failed:', err);
-      window.toast?.('Photo upload failed. Please try again.', 'error');
-    } finally {
-      if (spinner) spinner.style.display = 'none';
-      if (wrap)    wrap.style.cursor = 'pointer';
-      input.value = '';  // allow re-selection of same file
-    }
-  });
-}
 
 // ── Location Tab ──────────────────────────────────────────
 

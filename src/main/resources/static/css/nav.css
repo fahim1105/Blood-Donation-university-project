@@ -1,5 +1,5 @@
 /* Shared HEMO navbar — used on every route */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* Font imported from hemo.css via CSS variable */
 
 .hidden { display: none !important; }
 
@@ -18,7 +18,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-family-primary, 'Eater', serif);
   box-sizing: border-box;
 }
 

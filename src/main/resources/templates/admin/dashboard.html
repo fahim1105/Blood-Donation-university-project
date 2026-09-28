@@ -6,13 +6,13 @@
   <title>Admin Dashboard — HEMO®</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/nav.css"/>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0A0A0A; color: #fff; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    body { background: #0A0A0A; color: #fff; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
     ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #DC2626; }
-    button, a { font-family: 'Space Grotesk', sans-serif; }
+    button, a { font-family: 'Poppins', sans-serif; }
 
     .admin-topbar { display: none; }
     .admin-layout { display: flex; flex: 1; padding-top: 64px; }
@@ -44,12 +44,12 @@
     .action-btn-red { color: #fca5a5; } .action-btn-red:hover { background: rgba(220,38,38,0.12); }
     .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
     @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr; } .admin-sidebar { display: none; } }
-    .filter-tab { background:transparent;border:1px solid #333;color:rgba(255,255,255,0.5);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all 200ms; }
+    .filter-tab { background:transparent;border:1px solid #333;color:rgba(255,255,255,0.5);padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 200ms; }
     .filter-tab.active { background:rgba(220,38,38,0.15);border-color:#DC2626;color:#DC2626; }
 
     /* ── Pagination ──────────────────────────────────────── */
     .pagination { display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;flex-wrap:wrap; }
-    .pg-btn { background:transparent;border:1px solid #333;color:rgba(255,255,255,0.5);padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all 200ms;min-width:36px; }
+    .pg-btn { background:transparent;border:1px solid #333;color:rgba(255,255,255,0.5);padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 200ms;min-width:36px; }
     .pg-btn:hover:not(:disabled) { border-color:#DC2626;color:#DC2626; }
     .pg-btn.active { background:rgba(220,38,38,0.15);border-color:#DC2626;color:#DC2626;font-weight:700; }
     .pg-btn:disabled { opacity:0.3;cursor:not-allowed; }
@@ -427,7 +427,7 @@ window.loadUsersPage = async function(page) {
         '<td>' + (u.available ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>') + '</td>' +
         '<td><select class="role-select" data-id="' + esc(u.id) + '" data-original="' + esc(u.role) + '" ' +
           'onchange="changeRole(this)" ' +
-          'style="background:#1C1C1C;border:1px solid #333;color:#fff;border-radius:6px;padding:4px 8px;font-size:0.8rem;font-family:\'Space Grotesk\',sans-serif;cursor:pointer;">' +
+          'style="background:#1C1C1C;border:1px solid #333;color:#fff;border-radius:6px;padding:4px 8px;font-size:0.8rem;font-family:\'Poppins\',sans-serif;cursor:pointer;">' +
           roleOpts + '</select></td>' +
         '<td>' + (u.active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-deactivated">Deactivated</span>') + '</td>' +
         '<td>' + actionBtn + '</td>' +
@@ -496,3 +496,4 @@ async function changeRole(sel) {
 <script src="/js/toast.js"></script>
 </body>
 </html>
+
